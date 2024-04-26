@@ -1,5 +1,3 @@
-#In this program, I want to practice using the argparse library, to parse command line arguments so that the program can take an input file
-#This is the concurrent part of the project, where we want to use the multiprocessing library to spawn multiple processes to simulate the game of life
 #We determine the number of processes to spawn using the command line argument -p
 #-i <path_to_input_file> Input type: string, required
 #-o <path_to_output_file> Input type: string, required
@@ -8,7 +6,7 @@
 import argparse
 import sys
 import copy
-from multiprocessing import Process
+import multiprocessing as mp
 
 parser = argparse.ArgumentParser(description = "Cellular Life Simulator")
 parser.add_argument("-i", "--input" , type = str, help = "Path to input file", required = True)
@@ -68,9 +66,7 @@ def main():
     for _ in range(100): #Simulate the matrix for 100 generations
         processes = []
         for i in range(args.processes):
-            start = i * (len(matrix) // args.processes)
-            end = (i + 1) * (len(matrix) // args.processes)
-            processes.append(Process(target = simulate, args = (matrix[start:end],)))
+            processes.append(Process(target = simulate, args = (matrix,)))
             processes[i].start()
         
         for i in range(args.processes):
@@ -91,4 +87,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
