@@ -1,3 +1,4 @@
+#This is the concurrent part of the project, where we want to use the multiprocessing library to spawn multiple processes to simulate the game of life
 #We determine the number of processes to spawn using the command line argument -p
 #-i <path_to_input_file> Input type: string, required
 #-o <path_to_output_file> Input type: string, required
@@ -37,14 +38,13 @@ def simulate(matrix):
                     new_matrix[i][j] = "O"
                 else:
                     new_matrix[i][j] = "."
-    matrix = copy.deepcopy(new_matrix)
     return new_matrix
 
 def addNeighbors(matrix, i, j):
     #Neighbors of the matrix are the 8 cells surrounding the current cell, we can define a sub array on sides adjacent to the current cell
     #If the cell is at the end of the matrix wrap around. This is done using the modulo operator.
     neighbors = 0
-    for x in range(-1, 2): 
+    for x in range(-1, 2):
         for y in range(-1, 2):
             if x == 0 and y == 0:
                 continue
@@ -61,20 +61,19 @@ def main():
     except FileNotFoundError:
         print("Input file not found")
         sys.exit(1)
-    #print(matrix)
+
+    #We need to create chunks of the matrix to be processed by each process
+    chunk_size = len(matrix) // args.processes
+    chunked_matrix = [matrix[i:i + chunk_size] for i in range(0, len(matrix), chunk_size)]
+    print(chunked_matrix)
     #Implement the concurrent part of the program
+    pool = mp.Pool(processes = args.processes) #Create a pool of processes
     for _ in range(100): #Simulate the matrix for 100 generations
-        processes = []
-        for i in range(args.processes):
-            processes.append(Process(target = simulate, args = (matrix,)))
-            processes[i].start()
-        
-        for i in range(args.processes):
-            processes[i].join()
-    #for _ in range(100): #Simulate the matrix for 100 generations
-    #    matrix = simulate(matrix)
-
-
+        #Simulate the matrix using the simulate function and the matrix as an argument
+        chunked_matrix = pool.map(simulate, chunked_matrix)
+        matrix = [row for chunk in chunked_matrix for row in chunk]
+    pool.close()
+    pool.join()
 
     print(matrix)
     try:
@@ -87,3 +86,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
