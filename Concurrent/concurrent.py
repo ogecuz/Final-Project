@@ -1,5 +1,14 @@
-#This is the concurrent part of the project, where we want to use the multiprocessing library to spawn multiple processes to simulate the game of life
-#We determine the number of processes to spawn using the command line argument -p
+#!\home\thoma\main\Final_Project\Concurrent\concurrent.py
+"""
+Title          : Thomas_Cook_R11788009_R11788009_final_project.py
+Description    : Cellular Life Simulator
+Author         : Thomas Cook
+Date           : 04/29/2024
+Version        : 1.0
+Usage          : python Thomas_Cook_R11788009_R11788009_final_project.py -i <path_to_input_file> -o <path_to_output_file> -p <int>
+Notes          : The input file will contain a matrix of cells. The matrix will be a square matrix of size m x n where m and n are positive integers
+Python Version : 3.11.1
+"""
 #-i <path_to_input_file> Input type: string, required
 #-o <path_to_output_file> Input type: string, required
 #-p <int> Input type: int, not required, default value is 1
@@ -52,6 +61,29 @@ def addNeighbors(matrix, i, j):
                 neighbors += 1
     return neighbors
 
+def create_chunks(matrix, num_chunks):
+    chunk_size = len(matrix) // num_chunks
+    chunked_matrix = []
+    for i in range(num_chunks):
+        start = i * chunk_size
+        end = start + chunk_size
+        chunk = matrix[start:end]
+        
+        # Add the row above the current chunk
+        if i > 0:
+            chunk.insert(0, matrix[start-1])
+        else:
+            chunk.insert(0, matrix[-1])  # Add the last row for the first chunk
+        
+        # Add the row below the current chunk
+        if i < num_chunks - 1:
+            chunk.append(matrix[end])
+        else:
+            chunk.append(matrix[0])  # Add the first row for the last chunk
+        
+        chunked_matrix.append(chunk)
+    return chunked_matrix
+
 
 def main():
     print("Project :: 11788009")
@@ -63,15 +95,20 @@ def main():
         sys.exit(1)
 
     #We need to create chunks of the matrix to be processed by each process
-    chunk_size = len(matrix) // args.processes
-    chunked_matrix = [matrix[i:i + chunk_size] for i in range(0, len(matrix), chunk_size)]
-    print(chunked_matrix)
+    #chunked_matrix = create_chunks(matrix, args.processes)
+    #print(chunked_matrix)
+
     #Implement the concurrent part of the program
-    pool = mp.Pool(processes = args.processes) #Create a pool of processes
-    for _ in range(100): #Simulate the matrix for 100 generations
-        #Simulate the matrix using the simulate function and the matrix as an argument
-        chunked_matrix = pool.map(simulate, chunked_matrix)
-        matrix = [row for chunk in chunked_matrix for row in chunk]
+    pool = mp.Pool(processes = args.processes) #Create a pool of processes given user input
+    for _ in range(100):
+        chunked_matrix = create_chunks(matrix, args.processes)
+        simulated_chunks = pool.map(simulate, chunked_matrix)
+
+        matrix = []
+        for chunk in simulated_chunks:
+            matrix.extend(chunk[1:-1])
+        #print(matrix)
+    
     pool.close()
     pool.join()
 
