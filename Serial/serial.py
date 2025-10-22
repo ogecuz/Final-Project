@@ -1,6 +1,3 @@
-#In this program, I want to practice using the argparse library, to parse command line arguments so that the program can take an input file
-#This is the concurrent part of the project, where we want to use the multiprocessing library to spawn multiple processes to simulate the game of life
-#We determine the number of processes to spawn using the command line argument -p
 #-i <path_to_input_file> Input type: string, required
 #-o <path_to_output_file> Input type: string, required
 #-p <int> Input type: int, not required, default value is 1
