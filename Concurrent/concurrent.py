@@ -1,11 +1,11 @@
 #!\home\thoma\main\Final_Project\Concurrent\concurrent.py
 """
-Title          : Thomas_Cook_R11788009_R11788009_final_project.py
+Title          : concurrent.py
 Description    : Cellular Life Simulator
 Author         : Thomas Cook
 Date           : 04/29/2024
 Version        : 1.0
-Usage          : python Thomas_Cook_R11788009_R11788009_final_project.py -i <path_to_input_file> -o <path_to_output_file> -p <int>
+Usage          : python concurrent.py -i <path_to_input_file> -o <path_to_output_file> -p <int>
 Notes          : The input file will contain a matrix of cells. The matrix will be a square matrix of size m x n where m and n are positive integers
 Python Version : 3.11.1
 """
